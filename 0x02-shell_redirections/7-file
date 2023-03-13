@@ -1,2 +1,2 @@
 #!/bin/bash
-echo -e "0x02-shell_redirections\n" > "\*\\\'\"Best School\"\'\\\*$\?\*\*\*\*\*:) "
+echo "0x02-shell_redirections" > "\*\\\'\"Best School\"\'\\\*$\?\*\*\*\*\*:) "
