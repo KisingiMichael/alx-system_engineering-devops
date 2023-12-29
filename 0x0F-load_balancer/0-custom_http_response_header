@@ -1,0 +1,26 @@
+#!/usr/bin/env bash
+#configure web-02
+
+#update packages
+sudo apt-get update
+sudo apt-get install nginx -y nginx 
+
+#create an index page
+echo "Hello World!" | sudo tee /var/www/html/index.html
+
+#perform redirection
+new_strting="server_name _;\n\trewrite ^\/redirect_me https:\/\/github.com/\KisingiMichael permanent"
+
+sudo sed -i "s/server_name _;/$new_string/" /etc/nginx/sites-enabled/default
+
+#create custome error page
+echo "Ceci m'est pas une page" | sudo tee var/www/html/404.html
+
+#create custom response header
+sudo sed -i "server_name _;/a add_header X-Served-By $HOSTNAME;" /etc/nginx/sites-enabled/default
+
+#Test for errors
+sudo nginx -t
+
+#restart nginx server
+sudo service nginx restart
