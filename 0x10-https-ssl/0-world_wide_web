@@ -15,5 +15,3 @@ do
 	display_info "$1" "$subdomain"
     fi
 done
-
-
