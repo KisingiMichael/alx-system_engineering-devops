@@ -1,9 +1,5 @@
 #!/usr/bin/python3
-"""
-Exports to-do list information for a given employee ID to JSON format based on task0
-"""
-#!/usr/bin/python3
-"""Exports to-do list information for a given employee ID to CSV format."""
+"""Exports to-do list information for a given employee ID to csv from task0"""
 import csv
 import requests
 import sys
