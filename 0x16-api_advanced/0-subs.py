@@ -4,20 +4,17 @@ Module Docs
 """
 import requests
 
+headers = {"User-Agent": "MyCustomUserAgent/1/0"}
+
 
 def number_of_subscribers(subreddit):
     """
     Function Docs
     """
-    url = 'https://www.reddit.com'
-    header = {
-        'Accept': 'application/json',
-        'User-Agent': 'Mozilla/5.0 (Windows NT 10.0; Win64; x64)'
-    }
-    response = requests.get('{}/r/{}/about/.json'.format(url, subreddit),
-                            headers=header,
-                            allow_redirects=False
-                            )
+    url = "https://www.reddit.com/r/{}/about.json".format(subreddit)
+    response = requests.get(url, allow_redirects=False, headers=headers)
     if response.status_code == 200:
-        return response.json()['data']['subscribers']
-    return 0
+        data = response.json()
+        return data["data"]["subscribers"]
+    else:
+        return 0
