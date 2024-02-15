@@ -1,23 +1,24 @@
-#automating works using puppet
+# Setup New Ubuntu server with nginx
 
 exec { 'update system':
         command => '/usr/bin/apt-get update',
 }
 
 package { 'nginx':
-          ensure  => installed,
-          require => Exec['update system']
-}
-exec { 'redirect_me':
-       command => 'sed -i "241\ rewrite ^redirect_me https://www.github.com/KisingiMichael permanent;" /etc/nginx/sites-enabled/default',
-       provider => 'shell'
+	ensure => 'installed',
+	require => Exec['update system']
 }
 
-file { '/var/www/html/index.html':
-       content => 'Hello World!'
+file {'/var/www/html/index.html':
+	content => 'Hello World!'
 }
 
-service { 'nginx':
-  ensure  => running,
-  require => Package['nginx'],
+exec {'redirect_me':
+	command => 'sed -i "24i\rewrite ^/redirect_me https://www.git.com/KisingiMichael permanent;" /etc/nginx/sites-enabled/default',
+	provider => 'shell'
+}
+
+service {'nginx':
+	ensure => running,
+	require => Package['nginx']
 }
