@@ -1,20 +1,50 @@
 #!/usr/bin/env bash
 
-#customize a 404 page redirection
+# Update the package list
+sudo apt update
 
-sudo apt-get update
-sudo apt-get install -y nginx
+# Install Nginx
+sudo apt install -y nginx
 
-sudo ufw allow 'Nginx HTTP'
+# Create the custom 404 page
+CUSTOM_404_PAGE="/var/www/html/custom_404.html"
+sudo bash -c "cat > $CUSTOM_404_PAGE <<EOF
+<html>
+<head><title>404 Not Found</title></head>
+<body>
+<h1>404 Not Found</h1>
+<p>Ceci n'est pas une page</p>
+</body>
+</html>
+EOF"
 
-sudo chown -R "$USER":"$USER" /var/www/html
-sudo chmod -R 755 /var/www
+# Create a new Nginx configuration file for the custom 404 page
+CUSTOM_404_CONFIG="/etc/nginx/sites-available/custom_404"
 
-echo -e "Hello World!" > /var/www/html/index.nginx-debian.html
+sudo bash -c "cat > $CUSTOM_404_CONFIG <<EOF
+server {
+    listen 80;
+    server_name _;
 
-sudo sed -i '24i\	rewrite ^/redirect_me https://www.github.com/KisingiMichael permanent;' /etc/nginx/sites-available/default
+    root /var/www/html;
+    index index.html;
 
-echo "Ceci n'est pas une page" >> /var/www/html/error_404.html
-sudo sed -i '25i\	error_page 404 /error_404.html;' /etc/nginx/sites-available/default
+    # Custom 404 page
+    error_page 404 /custom_404.html;
+    location = /custom_404.html {
+        internal;
+    }
+}
+EOF"
 
-sudo service nginx restart
+# Enable the configuration by creating a symlink to sites-enabled
+sudo ln -s $CUSTOM_404_CONFIG /etc/nginx/sites-enabled/
+
+# Remove the default Nginx configuration to avoid conflicts
+sudo rm /etc/nginx/sites-enabled/default
+
+# Test the Nginx configuration for syntax errors
+sudo nginx -t
+
+# Reload Nginx to apply the new configuration
+sudo systemctl reload nginx
