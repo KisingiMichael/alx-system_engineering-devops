@@ -1,16 +1,41 @@
-#!/usr/bin/env bash
+#!/bin/bash
 
-#perform 301 permanent redirections
+# Update the package list
+sudo apt update
 
-sudo apt-get update
-sudo apt-get install -y nginx
+# Install Nginx
+sudo apt install -y nginx
 
-sudo ufw allow 'Nginx HTTP'
+# Create a new Nginx configuration file for the redirect
+REDIRECT_CONFIG="/etc/nginx/sites-available/redirect_me"
 
-sudo chown -R "$USER":"$USER" /var/www/html
-sudo chmod -R 755 /var/www
+# Define the redirection target
+TARGET_URL="https://www.github.com/KisingiMichael"
 
-echo -e "Hello World!" > /var/www/html/index.nginx-debian.html
+# Write the Nginx configuration for the redirect
+sudo bash -c "cat > $REDIRECT_CONFIG <<EOF
+server {
+    listen 80;
+    server_name _;
+    
+    location /redirect_me {
+        return 301 $TARGET_URL;
+    }
+}
+EOF"
 
-sudo sed -i '24i\	rewrite ^/redirect_me https://www.github.com/KisingiMichael permanent;' /etc/nginx/sites-available/default
-sudo service nginx restart
+# Enable the configuration by creating a symlink to sites-enabled
+sudo ln -s $REDIRECT_CONFIG /etc/nginx/sites-enabled/
+
+# Remove the default Nginx configuration to avoid conflicts
+sudo rm /etc/nginx/sites-enabled/default
+
+# Test the Nginx configuration for syntax errors
+sudo nginx -t
+
+# Reload Nginx to apply the new configuration
+sudo systemctl reload nginx
+
+# Print a success message
+echo "Nginx has been configured with a 301 redirect from /redirect_me to $TARGET_URL"
+
