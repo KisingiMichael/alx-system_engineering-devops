@@ -1,4 +1,4 @@
-#!/bin/bash
+#!/usr/bin/env bash
 
 # Update the package list
 sudo apt update
@@ -35,7 +35,3 @@ sudo nginx -t
 
 # Reload Nginx to apply the new configuration
 sudo systemctl reload nginx
-
-# Print a success message
-echo "Nginx has been configured with a 301 redirect from /redirect_me to $TARGET_URL"
-
