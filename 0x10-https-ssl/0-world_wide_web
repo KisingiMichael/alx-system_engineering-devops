@@ -1,25 +1,35 @@
 #!/usr/bin/env bash
-# Displays informtation aboutdomains and subdomains
 
-# variables and parameters
-subdomains=( "www" "lb-01" "web-01" "web-02" )
-domain="$1"
-sub="$2"
 
-dig_cmd () {
-	# function variables
-	sub="$2"
-	INFO="$(dig "$sub.$domain" | grep -A1 'ANSWER SECTION:' | awk 'NR==2')"
-	IP=$(echo "$INFO" | awk '{print $5}')
-	RECORD=$(echo "$INFO" | awk '{print $4}')
+# Function to check subdomain information
+check_subdomain() {
+  local domain=$1
+  local subdomain=$2
+  local fqdn="${subdomain}.${domain}"
 
-	echo -e "The subdomain $sub is a $RECORD record and points to $IP"
+  # Perform a DNS lookup using dig
+  record_info=$(dig +short "${fqdn}")
+
+  if [ -z "$record_info" ]; then
+    echo "No DNS record found for ${fqdn}"
+  else
+    # Get the record type and destination
+    record_type=$(dig +short -t ANY "${fqdn}" | awk '{print $1}')
+    echo "The subdomain ${fqdn} is a ${record_type} record and points to ${record_info}"
+  fi
 }
 
-if [ $# -eq 1 ]; then
-	for subs in "${subdomains[@]}"; do
-		dig_cmd "$domain" "$subs"
-	done
-elif [ $# -eq 2 ]; then
-	dig_cmd "$domain" "$sub"
+# Main script logic
+domain=$1
+subdomain=$2
+
+# Check if a subdomain is provided
+if [ -z "$subdomain" ]; then
+  # If no specific subdomain is provided, check for www, lb-01, web-01, and web-02
+  for sub in www lb-01 web-01 web-02; do
+    check_subdomain "$domain $sub"
+  done
+else
+  # If a specific subdomain is provided, check that subdomain
+  check_subdomain "$domain $subdomain"
 fi
